@@ -5,21 +5,24 @@ function get_time_string(value) {
 /**
  * Create notification
  * 
+ * @param {object} session Session Object
  * @param {Date} end_date Ending Date
  * @param {integer} notify_ahead_seconds Number of seconds to be notified before the session expire
  */
-function create_notification(session_id, end_date, notify_ahead_seconds) {
+function create_notification(session, end_date, notify_ahead_seconds) {
     var now = new Date();
+    var session_id = session.token;
+    var license_plate = session.plate.id;
   
     // Enable notification when expires in the future
     var diff_ms = (end_date.getTime() - now.getTime()) / 1000;
   
     if (diff_ms > 0) {
-      var title = 'A sua sessão expira em ' + notify_ahead_seconds + ' segundos!';
-      var message = 'A sua sessão vai expirar brevemente!';
+      var title = 'A sua sessão expira em ' + Math.round(notify_ahead_seconds/60) + ' minutos!';
+      var message = 'A sua sessão do veículo ' + license_plate + ' vai expirar brevemente!';
       if (notify_ahead_seconds == 0) {
         title = 'A sua sessão expirou!';
-        message = 'A sua sessão na Via Verde - Estacionar expirou!';
+        message = 'A sua sessão do veículo ' + license_plate + ' na Via Verde - Estacionar expirou!';
       }
   
       if (diff_ms - notify_ahead_seconds > 0) {

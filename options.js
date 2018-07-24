@@ -1,4 +1,4 @@
-var config;
+var config = {};
 var notifications = {};
 
 var municipal_services = new Array();
@@ -125,6 +125,16 @@ function get_vehicles() {
   });
 }
 
+function is_session_in_municipal_zone(session_list) {
+  for( var i = 0; i < session_list.length; i++) {
+    if (municipal_zones[session_list[i].position_token] === undefined) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function get_active_sessions() {
   api.getSessions("ACTIVE", function(response) {
     var active_sessions_html = document.getElementById("active_sessions_list");
@@ -138,25 +148,32 @@ function get_active_sessions() {
     if (max > response.length) {
       max = response.length;
     }
+    
+    // Check if session zone is the same as selected
+    var in_municipal_zone = is_session_in_municipal_zone(response);
 
     // Insert new childs
-    var selected = false;
-    for (var i = 0; i < max; i++) {
-      var div = create_session_card(response[i]);
-      active_sessions_html.appendChild(div);
+    if (in_municipal_zone) {
+      var selected = false;
+      for (var i = 0; i < max; i++) {
+        var div = create_session_card(response[i]);
+        active_sessions_html.appendChild(div);
 
-      // Select last current active session
-      if (!selected) {
-        selected = true;
+        // Select last current active session
+        if (!selected) {
+          selected = true;
 
-        var zones_html = document.getElementById("zones");
-        for(var j = 0; j < zones_html.length; j++) {
-          if (zones_html[j].getAttribute('value') == response[i].position_token) {
-            zones_html[j].setAttribute('selected', '');
-            active_session = response[i];
+          var zones_html = document.getElementById("zones");
+          for(var j = 0; j < zones_html.length; j++) {
+            if (zones_html[j].getAttribute('value') == response[i].position_token) {
+              zones_html[j].setAttribute('selected', '');
+              active_session = response[i];
+            }
           }
         }
       }
+    } else {
+      alert("As suas sessões pertencem a outro municipio, por favor selecionar outro municipio!");
     }
 
     // Check and create notifications
@@ -165,8 +182,8 @@ function get_active_sessions() {
       var start_date = new Date(response[i].dtstart.date);
       var end_date = new Date(start_date.getTime() + minutes * 60 * 1000);
       
-      create_notification(response[i].token, end_date, 0);
-      create_notification(response[i].token, end_date, 5*60);
+      create_notification(response[i], end_date, 0);
+      create_notification(response[i], end_date, 5*60);
     }
   });
 }
@@ -185,10 +202,18 @@ function get_closed_sessions() {
       max = response.length;
     }
 
-    // Insert new childs
-    for (var i = 0; i < max; i++) {
-        var div = create_session_card(response[i]);
-        active_sessions_html.appendChild(div);
+    // Check if session zone is the same as selected
+    var in_municipal_zone = is_session_in_municipal_zone(response);
+
+    if (in_municipal_zone) {
+      // Insert new childs
+      for (var i = 0; i < max; i++) {
+          var div = create_session_card(response[i]);
+          active_sessions_html.appendChild(div);
+      }
+    } else {
+      // TODO: This will appear twice, add a check.
+      alert("As suas sessões pertencem a outro municipio, por favor selecionar outro municipio!");
     }
   });
 }
@@ -282,13 +307,18 @@ function load_municipal_zones(response) {
 /**
  * Get parking zones from a Municipal zone
  */
-function get_municipal_information() {
+function get_municipal_information(event) {
   municipal_info = municipal_services[document.getElementById('municipal').value]
   api.getMunicipal(municipal_info.token, load_municipal_zones);
 
   // Save municipal token on settings
   config.municipal_token = municipal_info.token;
   chrome.storage.sync.set({config: config});
+
+  if (event.type != "click") {
+    get_active_sessions();
+    get_closed_sessions();
+  }
 }
 
 function agree() {
@@ -302,11 +332,6 @@ function donotagree() {
 }
 
 function start_parking() {
-  if (active_session == undefined) {
-    alert("Sem sessão activa, tem que iniciar uma sessão primeiro pela app no telemovel! Se já iniciou faca refresh!");
-    return;
-  }
-
   var parking = new Parking();
 
   parking.setLicensePlate(document.getElementById("vehicles").value);
@@ -390,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('getClosedSessions').addEventListener('click', get_closed_sessions);
 
   document.getElementById('municipal').addEventListener('click', get_municipal_information);
-  document.getElementById('municipal').addEventListener('onchange', get_municipal_information);
+  document.getElementById('municipal').addEventListener('change', get_municipal_information);
 
   document.getElementById('test_start_parking').addEventListener('click', test_start_parking);
   document.getElementById('start_parking').addEventListener('click', start_parking);

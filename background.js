@@ -46,8 +46,8 @@ chrome.storage.sync.get(['config', 'notifications'], function(items) {
             var start_date = new Date(response[i].dtstart.date);
             var end_date = new Date(start_date.getTime() + minutes * 60 * 1000);
             
-            create_notification(response[i].token, end_date, 0);
-            create_notification(response[i].token, end_date, 5*60); // 5m before
+            create_notification(response[i], end_date, 0);
+            create_notification(response[i], end_date, 5*60); // 5m before
           }
         });
       });
@@ -78,8 +78,8 @@ function check_active_sessions() {
       var start_date = new Date(response[i].dtstart.date);
       var end_date = new Date(start_date.getTime() + minutes * 60 * 1000);
       
-      create_notification(response[i].token, end_date, 0);
-      create_notification(response[i].token, end_date, 5*60);
+      create_notification(response[i], end_date, 0);
+      create_notification(response[i], end_date, 5*60);
     }
   });
 
