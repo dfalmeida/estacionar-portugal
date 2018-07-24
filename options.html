@@ -1,0 +1,142 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <style>
+    body {
+      margin: 0 auto;
+      width: 900px;
+    }
+
+    #account_id {
+      font-weight: bold;
+    }
+
+    #disclaimer {
+      background-color: #d1fbd1;
+      padding: 30px;
+      margin: 20px;
+    }
+
+    #disclaimer li {
+      padding-bottom: 20px;
+    }
+    #disclaimer li:last-child {
+      padding-bottom: 0px;
+    }
+    .session_card {
+      width: 400px;
+      border: 1px solid #efefef;
+      padding: 20px;
+      margin-bottom: 6px;
+    }
+
+    #settings {
+      display: none;
+    }
+
+    .auth {
+      float: left;
+      margin-right: 60px;
+    }
+    .auth label {
+      width: 120px;
+      display: block;
+      float: left;
+    }
+    .auth input {
+      padding: 3px 6px;
+      width: 200px;
+    }
+
+    .choose_municipal {
+      float: right;
+    }
+    </style>
+  </head>
+  <body>
+
+    <div id="disclaimer">
+      <h2>Por favor leia a seguinte mensagem com MUITO ATENÇÃO!</h2>
+      <ul>
+        <li>Não tenho nenhuma ligação a Via Verde, a EMPark ou a qualquer empresa de gestão de parques de estacionamentos. Esta extensão comunica directamente com os servidores da EMPark e mais nenhuma informação é enviada para fora desta aplicação, tirando as coordenadas para renderizar o local no mapa (neste caso é utilizado o serviço da Google).</li>
+        <li>Não me responsabilizo por qualquer falha na aplicação. Esta extensão poderá falhar na colocação de "moeda" no parquimetro, ou outras situações e deverá ser sempre <b>responsabilidade do utilizador</b> verificar se a mesma está a funcionar correctamente.</li>
+        <li>Não forneço qualquer tipo de suporte relativamente a utilização desta extensão. A utilização desta extensão é completamente grátis, e vem sem garantia. Use ao seu risco.</li>
+      </ul>
+      <div style="margin: 0px auto;">
+        <button id="agree">Concordo</button>
+        <button id="donotagree">Não Concordo</button>
+      </div>
+    </div>
+
+    <div id="settings">
+
+      <div class="auth">
+        <h2>Autenticação</h2>
+        <div><span style="width: 120px; display: inline-block; padding: 8px 0px;">Account ID:</span> <span id="account_id"></span></div>
+        <label for='email'>Utilizador:</label>
+        <input type="text" id="email" name="email" /><br />
+        <label for='password'>Palavra-chave:</label>
+        <input type="password" id="password" name="password" /><br />
+
+        <button id="login">Login</button>
+      </div>
+
+      <div class="choose_municipal">
+      <h2 style="padding-top: 12px;">Municipio</h2>
+        <select id="municipal">
+        </select>
+      </div>
+
+      <div style="clear: both; padding-top: 10px;"></div>
+
+      <h2>Sessões</h2>
+
+      <div>
+        <h3>Inserir</h3>
+
+        <label>Matrícula:</label>
+        <select id="vehicles"></select><br />
+
+        <label>Zona:</label>
+        <select id="zones"></select><br />
+
+        <label>Duração</label>
+        <select id="duration"></select><br />
+
+        <div>
+          <span>Início:</span>
+          <span id="session_starts_at">-</span>
+        </div>
+        <div>
+            <span>Fim:</span>
+            <span id="session_ends_at">-</span>
+        </div>
+
+        <button id="test_start_parking">Verificar</button>
+        <button id="start_parking" disabled>Começar nova sessão</button>
+      </div>
+
+
+      <div style="float: left;">
+        <h3>Sessões passadas</h3>
+        <button id="getClosedSessions">Actualizar</button>
+        <div id="past_sessions_list">
+        </div>
+      </div>
+
+      <div style="float: right;">
+        <h3>Sessões Activas</h3>
+        <button id="getActiveSessions">Actualizar</button>
+        <div id="active_sessions_list">
+        </div>
+      </div>
+
+      <div style="clear: both;"></div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="common.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
